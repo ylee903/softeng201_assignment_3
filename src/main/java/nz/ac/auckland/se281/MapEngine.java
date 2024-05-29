@@ -165,6 +165,12 @@ public class MapEngine {
     MessageCli.TAX_INFO.printMessage(Integer.toString(taxes));
   }
 
+  /**
+   * Prompts the user to enter a country name.
+   *
+   * @param message the message to display to the user
+   * @return the name of the country entered by the user
+   */
   private String promptForCountry(String message) {
     System.out.print(message);
     String countryName = Utils.scanner.nextLine();
@@ -178,6 +184,13 @@ public class MapEngine {
     }
   }
 
+  /**
+   * This method finds the shortest path between two countries using BFS.
+   *
+   * @param start
+   * @param destination
+   * @return
+   */
   private List<String> findShortestPath(String start, String destination) {
     Map<String, String> parentCountry = new HashMap<>();
     Queue<String> queue = new LinkedList<>();
@@ -207,6 +220,12 @@ public class MapEngine {
     return shortestPath;
   }
 
+  /**
+   * This method extracts the continents from the path.
+   *
+   * @param path a list of countries
+   * @return a list of continents
+   */
   private List<String> extractContinents(List<String> path) {
     if (path == null || path.isEmpty()) return new ArrayList<>();
     List<String> continents = new ArrayList<>();
@@ -223,6 +242,12 @@ public class MapEngine {
     return continents;
   }
 
+  /**
+   * This method calculates the total taxes of the path.
+   *
+   * @param path a list of countries
+   * @return the total taxes
+   */
   private int calculateTaxes(List<String> path) {
     int totalTaxes = 0;
     for (int i = 1;
