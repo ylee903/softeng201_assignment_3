@@ -13,6 +13,7 @@ public class MapEngine {
   // Maps a country name to a set of names representing its direct neighbors.
   private HashMap<String, HashSet<String>> graph = new HashMap<>();
 
+  /** */
   public MapEngine() {
     // add other code here if you want
 
@@ -21,8 +22,11 @@ public class MapEngine {
 
   /** invoked one time only when constracting the MapEngine class. */
   /**
-   * Loads the map by reading countries and adjacencies data from files, and populates the countries
-   * and graph data structures accordingly.
+   * Loads the map data from files.
+   *
+   * <p>This method reads country and adjacency data from files, then populates the 'countries' and
+   * 'graph' HashMaps with this data. Each line of the countries data should be in the format
+   * "Country,Continent,Tax".
    */
   private void loadMap() {
     // This method is responsible for loading the map data
@@ -66,7 +70,17 @@ public class MapEngine {
     }
   }
 
-  /** this method is invoked when the user run the command info-country. */
+  /**
+   * this method is invoked when the user run the command info-country. Prompts the user to enter a
+   * country name and displays information about the country.
+   *
+   * <p>This method continuously prompts the user to enter a country name until a valid country is
+   * entered. It then retrieves the corresponding Country object from the 'countries' HashMap and
+   * displays the country's name, continent, and tax using the MessageCli.COUNTRY_INFO message. If
+   * the country does not exist in the 'countries' HashMap, it displays an error message using the
+   * MessageCli.INVALID_COUNTRY message. If an exception occurs during the process, it prints an
+   * error message.
+   */
   public void showInfoCountry() {
     while (true) {
       // Prompt the user to enter the name of the country
