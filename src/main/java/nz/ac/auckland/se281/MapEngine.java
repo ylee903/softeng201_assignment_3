@@ -143,17 +143,14 @@ public class MapEngine {
     // country is entered and verified using the getCountry method and store it as "source", print
     // an error message if the
     // country is invalid
-    while (true) {
+    while (source == null) {
       System.out.print(MessageCli.INSERT_SOURCE.getMessage());
       String sourceCountry = Utils.scanner.nextLine();
       sourceCountry = Utils.capitalizeFirstLetterOfEachWord(sourceCountry);
       try {
         source = getCountry(sourceCountry);
-        break;
       } catch (CountryNotFoundException e) {
         System.out.println(MessageCli.INVALID_COUNTRY.getMessage(sourceCountry));
-      } catch (Exception e) {
-        System.out.println("You somehow created an exceptional exception: " + e.getMessage());
       }
     }
 
@@ -162,17 +159,14 @@ public class MapEngine {
     // until a valid
     // country is entered and verified using the getCountry method, print an error message if the
     // country is invalid
-    while (true) {
+    while (destination == null) {
       System.out.print(MessageCli.INSERT_DESTINATION.getMessage());
       String destinationCountry = Utils.scanner.nextLine();
       destinationCountry = Utils.capitalizeFirstLetterOfEachWord(destinationCountry);
       try {
         destination = getCountry(destinationCountry);
-        break;
       } catch (CountryNotFoundException e) {
         System.out.println(MessageCli.INVALID_COUNTRY.getMessage(destinationCountry));
-      } catch (Exception e) {
-        System.out.println("You somehow created an exceptional exception: " + e.getMessage());
       }
     }
 
@@ -224,16 +218,34 @@ public class MapEngine {
     return shortestPath; // return empty list if no path found
   }
 
-  private List<String> extractContinents(List<Country> path) {
+  /**
+   * Extracts the continents visited along the path.
+   *
+   * @param path
+   * @return
+   */
+  private List<String> extractContinents(List<String> path) {
+    if (path == null) return new ArrayList<>();
     Set<String> continents = new HashSet<>();
-    for (Country country : path) {
+    for (String countryName : path) {
+      Country country = countries.get(countryName);
       continents.add(country.getContinent());
     }
     return new ArrayList<>(continents);
   }
 
+  /**
+   * Calculates the total taxes for the path.
+   *
+   * @param path
+   * @return
+   */
   private int calculateTaxes(List<String> path) {
-    return 0;
-    // Calculate total taxes, excluding the tax for the starting country
+    int totalTaxes = 0;
+    for (String countryName : path) {
+      Country country = countries.get(countryName);
+      totalTaxes += country.getTax();
+    }
+    return totalTaxes;
   }
 }
