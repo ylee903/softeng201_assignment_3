@@ -157,9 +157,11 @@ public class MapEngine {
     MessageCli.ROUTE_INFO.printMessage("[" + String.join(", ", shortestPath) + "]");
 
     // Display the list of continents using the MessageCli.CONTINENT_INFO message
-    MessageCli.CONTINENT_INFO.printMessage(String.join(", ", continents));
+    // also add brackets to make it work
+    MessageCli.CONTINENT_INFO.printMessage("[" + String.join(", ", continents) + "]");
 
     // Display the amount of taxes using the MessageCli.TAX_INFO message
+    // also add brackets to make it work
     MessageCli.TAX_INFO.printMessage(Integer.toString(taxes));
   }
 
@@ -206,12 +208,19 @@ public class MapEngine {
   }
 
   private List<String> extractContinents(List<String> path) {
-    Set<String> continents = new HashSet<>();
+    if (path == null || path.isEmpty()) return new ArrayList<>();
+    List<String> continents = new ArrayList<>();
+    Set<String> seenContinents = new HashSet<>();
+
     for (String countryName : path) {
       Country country = countries.get(countryName);
-      continents.add(country.getContinent());
+      if (!seenContinents.contains(country.getContinent())) {
+        continents.add(country.getContinent());
+        seenContinents.add(country.getContinent());
+      }
     }
-    return new ArrayList<>(continents);
+
+    return continents;
   }
 
   private int calculateTaxes(List<String> path) {
