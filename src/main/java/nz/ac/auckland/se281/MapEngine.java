@@ -16,7 +16,7 @@ public class MapEngine {
 
   // Graph representation using an adjacency list.
   // Maps a country name to a set of names representing its direct neighbors.
-  private HashMap<String, HashSet<String>> graph = new HashMap<>();
+  private HashMap<String, List<String>> graph = new HashMap<>();
 
   /** */
   public MapEngine() {
@@ -54,7 +54,7 @@ public class MapEngine {
       countries.put(name, new Country(name, continent, tax));
       // Initialize an empty HashSet for the country in the graph HashMap
       // The country's name is the key, and the HashSet will store the names of its neighbors
-      graph.put(name, new HashSet<>());
+      graph.put(name, new ArrayList<>());
     }
 
     // Loop through each line of the adjacencies data
@@ -65,11 +65,11 @@ public class MapEngine {
       String country = details[0]; // Extract the country name
 
       // Retrieve the country's adjacency set from the graph HashMap
-      HashSet<String> neighbors = graph.get(country); // Get the adjacency set for the country
+      List<String> neighbors = graph.get(country); // Get the neighbors list for the country
 
       // Loop through the remaining elements in the array (the names of the neighbors)
       for (int i = 1; i < details.length; i++) {
-        // Add each neighbor to the adjacency set
+        // Add each neighbor to the neighbors list
         neighbors.add(details[i]);
       }
     }
@@ -189,7 +189,7 @@ public class MapEngine {
         return shortestPath;
       }
 
-      for (String neighbor : graph.getOrDefault(currentCountry, new HashSet<>())) {
+      for (String neighbor : graph.getOrDefault(currentCountry, new ArrayList<>())) {
         if (!parentCountry.containsKey(neighbor)) {
           queue.add(neighbor);
           parentCountry.put(neighbor, currentCountry);
