@@ -99,19 +99,63 @@ public class MapEngine {
       } catch (CountryNotFoundException e) {
         System.out.println(MessageCli.INVALID_COUNTRY.getMessage(countryName));
       } catch (Exception e) {
-        System.out.println(MessageCli.COMMAND_NOT_FOUND.getMessage(e.getMessage()));
+        System.out.println("You somehow created an exceptional exception: " + e.getMessage());
       }
     }
   }
 
-  private Country getCountry(String countryName) throws CountryNotFoundException {
+  /**
+   * Retrieves a Country object from the 'countries' HashMap.
+   *
+   * <p>This method attempts to retrieve a Country object with the given country name from the
+   * 'countries' HashMap. If a country with the given name does not exist in the HashMap, it throws
+   * a CountryNotFoundException.
+   *
+   * @param countryName the name of the country to retrieve
+   * @return the Country object corresponding to the given country name
+   * @throws CountryNotFoundException if a country with the given name does not exist in the
+   *     'countries' HashMap
+   */
+  private Country getCountry(String countryName) {
     Country country = countries.get(countryName);
     if (country == null) {
-      throw new CountryNotFoundException("Country not found: " + countryName);
+      throw new CountryNotFoundException(MessageCli.INVALID_COUNTRY.getMessage(countryName));
     }
     return country;
   }
 
-  /** this method is invoked when the user run the command route. */
-  public void showRoute() {}
+  /**
+   * this method is invoked when the user run the command route.
+   *
+   * @throws CountryNotFoundException
+   */
+  public void showRoute() {
+
+    // prompt the user to enter the source country and verify it exists using the getCountry method
+    System.out.print(MessageCli.INSERT_SOURCE.getMessage());
+    String sourceCountry = Utils.scanner.nextLine();
+    sourceCountry = Utils.capitalizeFirstLetterOfEachWord(sourceCountry);
+    Country source = getCountry(sourceCountry);
+
+    // prompt the user to enter the destination country and verify it exists using the getCountry
+    // method
+    System.out.print(MessageCli.INSERT_DESTINATION.getMessage());
+    String destinationCountry = Utils.scanner.nextLine();
+    destinationCountry = Utils.capitalizeFirstLetterOfEachWord(destinationCountry);
+    Country destination = getCountry(destinationCountry);
+  }
+
+  private void findShortestPath(String start, String destination) {
+    // Implement BFS here to find the shortest path
+  }
+
+  private List<String> extractContinents(List<String> path) {
+    return path;
+    // Extract unique continents from the path
+  }
+
+  private int calculateTaxes(List<String> path) {
+    return 0;
+    // Calculate total taxes, excluding the tax for the starting country
+  }
 }
