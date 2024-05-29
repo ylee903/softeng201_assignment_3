@@ -68,32 +68,33 @@ public class MapEngine {
 
   /** this method is invoked when the user run the command info-country. */
   public void showInfoCountry() {
-    // This method is responsible for displaying information about a specific country
-    // Prompt the user to enter the name of the country
-    System.out.print(MessageCli.INSERT_COUNTRY);
-    // Read the user's input
-    String countryName = Utils.scanner.nextLine();
+    while (true) {
+      // Prompt the user to enter the name of the country
+      System.out.print(MessageCli.INSERT_COUNTRY.getMessage());
+      // Read the user's input
+      String countryName = Utils.scanner.nextLine();
 
-    try {
-      // Capitalize the first letter of each word in the country name
-      countryName = Utils.capitalizeFirstLetterEachWord(countryName);
+      try {
+        // Capitalize the first letter of each word in the country name
+        countryName = Utils.capitalizeFirstLetterOfEachWord(countryName);
 
-      // Retrieve the Country object for the specified country name
-      Country country = countries.get(countryName);
+        // Retrieve the Country object for the specified country name
+        Country country = countries.get(countryName);
 
-      // Check if the country exists in the countries HashMap
-      if (country != null) {
-        // If the country exists, display its information
-        System.out.println(
-            MessageCli.COUNTRY_INFO.getMessage(
-                country.getName(), country.getContinent(), Integer.toString(country.getTax())));
-      } else {
-        // If the country does not exist, display an error message
-        System.out.println(MessageCli.INVALID_COUNTRY.getMessage(countryName));
+        // Check if the country exists in the countries HashMap
+        if (country != null) {
+          // If the country exists, display its information using MessageCli
+          MessageCli.COUNTRY_INFO.printMessage(
+              country.getName(), country.getContinent(), Integer.toString(country.getTax()));
+          break; // Exit the loop after successful operation
+        } else {
+          // If the country does not exist, display an error message
+          System.out.println(MessageCli.INVALID_COUNTRY.getMessage(countryName));
+        }
+      } catch (Exception e) {
+        // If an exception occurs, print an error message
+        System.out.println("An error occurred: " + e.getMessage());
       }
-    } catch (Exception e) {
-      // If an exception occurs, print an error message
-      System.out.println("An error occurred: " + e.getMessage());
     }
   }
 
