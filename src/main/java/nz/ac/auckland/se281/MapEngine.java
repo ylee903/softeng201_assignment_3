@@ -130,19 +130,62 @@ public class MapEngine {
    * @throws CountryNotFoundException
    */
   public void showRoute() {
+    Country source = null;
+    Country destination = null;
 
-    // prompt the user to enter the source country and verify it exists using the getCountry method
-    System.out.print(MessageCli.INSERT_SOURCE.getMessage());
-    String sourceCountry = Utils.scanner.nextLine();
-    sourceCountry = Utils.capitalizeFirstLetterOfEachWord(sourceCountry);
-    Country source = getCountry(sourceCountry);
+    // create a while loop with a try-catch to keep prompting the user to enter the source country
+    // until a valid
+    // country is entered and verified using the getCountry method and store it as "source", print
+    // an error message if the
+    // country is invalid
+    while (true) {
+      System.out.print(MessageCli.INSERT_SOURCE.getMessage());
+      String sourceCountry = Utils.scanner.nextLine();
+      sourceCountry = Utils.capitalizeFirstLetterOfEachWord(sourceCountry);
+      try {
+        source = getCountry(sourceCountry);
+        break;
+      } catch (CountryNotFoundException e) {
+        System.out.println(MessageCli.INVALID_COUNTRY.getMessage(sourceCountry));
+      } catch (Exception e) {
+        System.out.println("You somehow created an exceptional exception: " + e.getMessage());
+      }
+    }
 
-    // prompt the user to enter the destination country and verify it exists using the getCountry
-    // method
-    System.out.print(MessageCli.INSERT_DESTINATION.getMessage());
-    String destinationCountry = Utils.scanner.nextLine();
-    destinationCountry = Utils.capitalizeFirstLetterOfEachWord(destinationCountry);
-    Country destination = getCountry(destinationCountry);
+    // create a while loop with a try-catch to keep prompting the user to enter the destination
+    // country
+    // until a valid
+    // country is entered and verified using the getCountry method, print an error message if the
+    // country is invalid
+    while (true) {
+      System.out.print(MessageCli.INSERT_DESTINATION.getMessage());
+      String destinationCountry = Utils.scanner.nextLine();
+      destinationCountry = Utils.capitalizeFirstLetterOfEachWord(destinationCountry);
+      try {
+        destination = getCountry(destinationCountry);
+        break;
+      } catch (CountryNotFoundException e) {
+        System.out.println(MessageCli.INVALID_COUNTRY.getMessage(destinationCountry));
+      } catch (Exception e) {
+        System.out.println("You somehow created an exceptional exception: " + e.getMessage());
+      }
+    }
+
+    // If the source and destination countries are the same, display a message and return
+    if (source.getName().equals(destination.getName())) {
+      System.out.println(MessageCli.NO_CROSSBORDER_TRAVEL);
+      return;
+    }
+    // Find the shortest path between the source and destination countries
+    findShortestPath(source.getName(), destination.getName());
+
+    // Extract the continents visited along the path and display them using MessageCli
+    List<String> path = extractContinents(null);
+    MessageCli.CONTINENT_INFO.printMessage(String.join(", ", path));
+
+    // Calculate the total taxes for the path and display the amount using MessageCli
+    int taxes = calculateTaxes(path);
+    MessageCli.TAX_INFO.printMessage(Integer.toString(taxes));
   }
 
   private void findShortestPath(String start, String destination) {
