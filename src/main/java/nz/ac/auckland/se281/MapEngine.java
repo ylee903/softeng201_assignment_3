@@ -79,37 +79,37 @@ public class MapEngine {
    * displays the country's name, continent, and tax using the MessageCli.COUNTRY_INFO message. If
    * the country does not exist in the 'countries' HashMap, it displays an error message using the
    * MessageCli.INVALID_COUNTRY message. If an exception occurs during the process, it prints an
-   * error message.
+   * error message using the MessageCli.COMMAND_NOT_FOUND message.
    */
   public void showInfoCountry() {
     while (true) {
-      // Prompt the user to enter the name of the country
       System.out.print(MessageCli.INSERT_COUNTRY.getMessage());
-      // Read the user's input
       String countryName = Utils.scanner.nextLine();
 
       try {
-        // Capitalize the first letter of each word in the country name
         countryName = Utils.capitalizeFirstLetterOfEachWord(countryName);
+        Country country =
+            getCountry(countryName); // Use a method that might throw CountryNotFoundException
 
-        // Retrieve the Country object for the specified country name
-        Country country = countries.get(countryName);
+        // If the country exists, display its information using MessageCli
+        MessageCli.COUNTRY_INFO.printMessage(
+            country.getName(), country.getContinent(), Integer.toString(country.getTax()));
+        break; // Exit the loop after successful operation
 
-        // Check if the country exists in the countries HashMap
-        if (country != null) {
-          // If the country exists, display its information using MessageCli
-          MessageCli.COUNTRY_INFO.printMessage(
-              country.getName(), country.getContinent(), Integer.toString(country.getTax()));
-          break; // Exit the loop after successful operation
-        } else {
-          // If the country does not exist, display an error message
-          System.out.println(MessageCli.INVALID_COUNTRY.getMessage(countryName));
-        }
+      } catch (CountryNotFoundException e) {
+        System.out.println(MessageCli.INVALID_COUNTRY.getMessage(countryName));
       } catch (Exception e) {
-        // If an exception occurs, print an error message
-        System.out.println("An error occurred: " + e.getMessage());
+        System.out.println(MessageCli.COMMAND_NOT_FOUND.getMessage(e.getMessage()));
       }
     }
+  }
+
+  private Country getCountry(String countryName) throws CountryNotFoundException {
+    Country country = countries.get(countryName);
+    if (country == null) {
+      throw new CountryNotFoundException("Country not found: " + countryName);
+    }
+    return country;
   }
 
   /** this method is invoked when the user run the command route. */
