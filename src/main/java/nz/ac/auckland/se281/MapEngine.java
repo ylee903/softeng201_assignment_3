@@ -1,8 +1,12 @@
 package nz.ac.auckland.se281;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 /** This class is the main entry point. */
 public class MapEngine {
@@ -188,8 +192,35 @@ public class MapEngine {
     MessageCli.TAX_INFO.printMessage(Integer.toString(taxes));
   }
 
-  private void findShortestPath(String start, String destination) {
-    // Implement BFS here to find the shortest path
+  private List<String> findShortestPath(String start, String destination) {
+    Map<String, String> parentCountry = new HashMap<>();
+    Queue<String> queue = new LinkedList<>();
+    List<String> shortestPath = new ArrayList<>();
+
+    queue.add(start);
+    parentCountry.put(start, null);
+
+    while (!queue.isEmpty()) {
+      String currentCountry = queue.poll();
+
+      if (currentCountry.equals(destination)) {
+        String country = destination;
+        while (country != null) {
+          shortestPath.add(0, country);
+          country = parentCountry.get(country);
+        }
+        return shortestPath;
+      }
+
+      for (String neighborCountry : graph.get(currentCountry)) {
+        if (!parentCountry.containsKey(neighborCountry)) {
+          queue.add(neighborCountry);
+          parentCountry.put(neighborCountry, currentCountry);
+        }
+      }
+    }
+
+    return shortestPath; // return empty list if no path found
   }
 
   private List<String> extractContinents(List<String> path) {
