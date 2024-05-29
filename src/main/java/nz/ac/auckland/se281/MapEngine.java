@@ -152,9 +152,15 @@ public class MapEngine {
     List<String> continents = extractContinents(shortestPath);
     int taxes = calculateTaxes(shortestPath);
 
-    System.out.println("The fastest route is: " + shortestPath);
-    System.out.println("You will visit the following continents: " + String.join(", ", continents));
-    System.out.println("You will spend this amount " + taxes + " for cross-border taxes");
+    // why does the enum version of this tottaly fail all test cases?
+    // we mannually added brackets to the string to make it work
+    MessageCli.ROUTE_INFO.printMessage("[" + String.join(", ", shortestPath) + "]");
+
+    // Display the list of continents using the MessageCli.CONTINENT_INFO message
+    MessageCli.CONTINENT_INFO.printMessage(String.join(", ", continents));
+
+    // Display the amount of taxes using the MessageCli.TAX_INFO message
+    MessageCli.TAX_INFO.printMessage(Integer.toString(taxes));
   }
 
   private String promptForCountry(String message) {
