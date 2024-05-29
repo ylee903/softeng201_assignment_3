@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 /** This class is the main entry point. */
 public class MapEngine {
@@ -223,9 +224,12 @@ public class MapEngine {
     return shortestPath; // return empty list if no path found
   }
 
-  private List<String> extractContinents(List<String> path) {
-    return path;
-    // Extract unique continents from the path
+  private List<String> extractContinents(List<Country> path) {
+    Set<String> continents = new HashSet<>();
+    for (Country country : path) {
+      continents.add(country.getContinent());
+    }
+    return new ArrayList<>(continents);
   }
 
   private int calculateTaxes(List<String> path) {
