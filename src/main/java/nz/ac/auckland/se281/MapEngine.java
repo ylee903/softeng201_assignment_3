@@ -1,51 +1,100 @@
 package nz.ac.auckland.se281;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 /** This class is the main entry point. */
 public class MapEngine {
+  // Maps a country name to its Country object (contains name, continent, and tax).
+  private HashMap<String, Country> countries = new HashMap<>();
+
+  // Graph representation using an adjacency list.
+  // Maps a country name to a set of names representing its direct neighbors.
+  private HashMap<String, HashSet<String>> graph = new HashMap<>();
 
   public MapEngine() {
     // add other code here if you want
-    loadMap(); // keep this mehtod invocation
+
+    loadMap(); // keep this method invocation
   }
 
   /** invoked one time only when constracting the MapEngine class. */
+  /**
+   * Loads the map by reading countries and adjacencies data from files, and populates the countries
+   * and graph data structures accordingly.
+   */
   private void loadMap() {
-    List<String> countries = Utils.readCountries();
-    List<String> adjacencies = Utils.readAdjacencies();
-    // add code here to create your data structures
+    // This method is responsible for loading the map data
+    // Read the list of countries from a file
+    List<String> countriesData = Utils.readCountries();
+    // Read the list of adjacencies (neighboring countries) from a file
+    List<String> adjacenciesData = Utils.readAdjacencies();
 
-    // Create a map to store countries
-    Map<String, Country> countryMap = new HashMap<>();
+    // Loop through each line of the countries data
+    for (String line : countriesData) {
+      // Split the line into an array of strings
+      // Each line is in the format "Country,Continent,Tax"
+      String[] details = line.split(",");
+      String name = details[0]; // Extract the country name
+      String continent = details[1]; // Extract the continent name
+      int tax = Integer.parseInt(details[2]); // Extract the tax value
 
-    // Parse countries
-    for (String country : countries) {
-      String[] parts = country.split(",");
-      Country c = new Country();
-      c.setName(parts[0]);
-      c.setContinent(parts[1]);
-      c.setTaxFees(Integer.parseInt(parts[2]));
-      countryMap.put(c.getName(), c);
+      // Create a new Country object and add it to the countries HashMap
+      // The country's name is the key, and the Country object is the value
+      countries.put(name, new Country(name, continent, tax));
+      // Initialize an empty HashSet for the country in the graph HashMap
+      // The country's name is the key, and the HashSet will store the names of its neighbors
+      graph.put(name, new HashSet<>());
     }
 
-    // Parse adjacencies
-    for (String adjacency : adjacencies) {
-      String[] parts = adjacency.split(",");
-      Country country1 = countryMap.get(parts[0]);
-      Country country2 = countryMap.get(parts[1]);
-      if (country1 != null && country2 != null) {
-        country1.addAdjacentCountry(country2);
-        country2.addAdjacentCountry(country1);
+    // Loop through each line of the adjacencies data
+    for (String line : adjacenciesData) {
+      // Split the line into an array of strings
+      // The first element is a country's name, and the remaining elements are its neighbors
+      String[] details = line.split(",");
+      String country = details[0]; // Extract the country name
+
+      // Retrieve the country's adjacency set from the graph HashMap
+      HashSet<String> neighbors = graph.get(country); // Get the adjacency set for the country
+
+      // Loop through the remaining elements in the array (the names of the neighbors)
+      for (int i = 1; i < details.length; i++) {
+        // Add each neighbor to the adjacency set
+        neighbors.add(details[i]);
       }
     }
   }
 
   /** this method is invoked when the user run the command info-country. */
   public void showInfoCountry() {
-    // add code here
+    // This method is responsible for displaying information about a specific country
+    // Prompt the user to enter the name of the country
+    System.out.print(MessageCli.INSERT_COUNTRY);
+    // Read the user's input
+    String countryName = Utils.scanner.nextLine();
+
+    try {
+      // Capitalize the first letter of each word in the country name
+      countryName = Utils.capitalizeFirstLetterEachWord(countryName);
+
+      // Retrieve the Country object for the specified country name
+      Country country = countries.get(countryName);
+
+      // Check if the country exists in the countries HashMap
+      if (country != null) {
+        // If the country exists, display its information
+        System.out.println(
+            MessageCli.COUNTRY_INFO.getMessage(
+                country.getName(), country.getContinent(), Integer.toString(country.getTax())));
+      } else {
+        // If the country does not exist, display an error message
+        System.out.println(MessageCli.INVALID_COUNTRY.getMessage(countryName));
+      }
+    } catch (Exception e) {
+      // If an exception occurs, print an error message
+      System.out.println("An error occurred: " + e.getMessage());
+    }
   }
 
   /** this method is invoked when the user run the command route. */

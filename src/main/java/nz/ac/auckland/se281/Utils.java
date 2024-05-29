@@ -24,6 +24,24 @@ public class Utils {
     return readCsv("./src/main/resources/adjacencies.csv");
   }
 
+  public static String capitalizeFirstLetterEachWord(String text) {
+    if (text == null || text.isEmpty()) {
+      return text;
+    }
+
+    StringBuilder capitalized = new StringBuilder();
+    String[] words = text.split("\\s+"); // Split the string by one or more spaces
+
+    for (String word : words) {
+      // Capitalize the first letter of each word and append to the result
+      String firstLetter = word.substring(0, 1).toUpperCase();
+      String restLetters = word.substring(1).toLowerCase();
+      capitalized.append(firstLetter).append(restLetters).append(" ");
+    }
+
+    return capitalized.toString().trim(); // Return the string without trailing spaces
+  }
+
   /**
    * read the content of a csv file.
    *
