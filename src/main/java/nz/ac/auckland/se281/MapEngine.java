@@ -135,56 +135,39 @@ public class MapEngine {
    * @throws CountryNotFoundException
    */
   public void showRoute() {
-    Country source = null;
-    Country destination = null;
+    String sourceCountry = promptForCountry("Enter the start country:");
+    String destinationCountry = promptForCountry("Enter the destination country:");
 
-    // create a while loop with a try-catch to keep prompting the user to enter the source country
-    // until a valid
-    // country is entered and verified using the getCountry method and store it as "source", print
-    // an error message if the
-    // country is invalid
-    while (source == null) {
-      System.out.print(MessageCli.INSERT_SOURCE.getMessage());
-      String sourceCountry = Utils.scanner.nextLine();
-      sourceCountry = Utils.capitalizeFirstLetterOfEachWord(sourceCountry);
-      try {
-        source = getCountry(sourceCountry);
-      } catch (CountryNotFoundException e) {
-        System.out.println(MessageCli.INVALID_COUNTRY.getMessage(sourceCountry));
-      }
-    }
-
-    // create a while loop with a try-catch to keep prompting the user to enter the destination
-    // country
-    // until a valid
-    // country is entered and verified using the getCountry method, print an error message if the
-    // country is invalid
-    while (destination == null) {
-      System.out.print(MessageCli.INSERT_DESTINATION.getMessage());
-      String destinationCountry = Utils.scanner.nextLine();
-      destinationCountry = Utils.capitalizeFirstLetterOfEachWord(destinationCountry);
-      try {
-        destination = getCountry(destinationCountry);
-      } catch (CountryNotFoundException e) {
-        System.out.println(MessageCli.INVALID_COUNTRY.getMessage(destinationCountry));
-      }
-    }
-
-    // If the source and destination countries are the same, display a message and return
-    if (source.getName().equals(destination.getName())) {
-      System.out.println(MessageCli.NO_CROSSBORDER_TRAVEL);
+    if (sourceCountry.equals(destinationCountry)) {
+      System.out.println("No cross-border travel is required!");
       return;
     }
-    // Find the shortest path between the source and destination countries
-    findShortestPath(source.getName(), destination.getName());
 
-    // Extract the continents visited along the path and display them using MessageCli
-    List<String> path = extractContinents(null);
-    MessageCli.CONTINENT_INFO.printMessage(String.join(", ", path));
+    List<String> shortestPath = findShortestPath(sourceCountry, destinationCountry);
+    if (shortestPath.isEmpty()) {
+      System.out.println("No path found from " + sourceCountry + " to " + destinationCountry);
+      return;
+    }
 
-    // Calculate the total taxes for the path and display the amount using MessageCli
-    int taxes = calculateTaxes(path);
-    MessageCli.TAX_INFO.printMessage(Integer.toString(taxes));
+    List<String> continents = extractContinents(shortestPath);
+    int taxes = calculateTaxes(shortestPath);
+
+    System.out.println("The fastest route is: " + shortestPath);
+    System.out.println("You will visit the following continents: " + String.join(", ", continents));
+    System.out.println("You will spend this amount " + taxes + " for cross-border taxes");
+  }
+
+  private String promptForCountry(String message) {
+    System.out.print(message);
+    String countryName = Utils.scanner.nextLine();
+    countryName = Utils.capitalizeFirstLetterOfEachWord(countryName);
+    try {
+      Country country = getCountry(countryName);
+      return country.getName();
+    } catch (CountryNotFoundException e) {
+      System.out.println(e.getMessage());
+      return promptForCountry(message); // Recurse until a valid country is entered
+    }
   }
 
   private List<String> findShortestPath(String start, String destination) {
@@ -197,7 +180,6 @@ public class MapEngine {
 
     while (!queue.isEmpty()) {
       String currentCountry = queue.poll();
-
       if (currentCountry.equals(destination)) {
         String country = destination;
         while (country != null) {
@@ -207,25 +189,17 @@ public class MapEngine {
         return shortestPath;
       }
 
-      for (String neighborCountry : graph.get(currentCountry)) {
-        if (!parentCountry.containsKey(neighborCountry)) {
-          queue.add(neighborCountry);
-          parentCountry.put(neighborCountry, currentCountry);
+      for (String neighbor : graph.getOrDefault(currentCountry, new HashSet<>())) {
+        if (!parentCountry.containsKey(neighbor)) {
+          queue.add(neighbor);
+          parentCountry.put(neighbor, currentCountry);
         }
       }
     }
-
-    return shortestPath; // return empty list if no path found
+    return shortestPath;
   }
 
-  /**
-   * Extracts the continents visited along the path.
-   *
-   * @param path
-   * @return
-   */
   private List<String> extractContinents(List<String> path) {
-    if (path == null) return new ArrayList<>();
     Set<String> continents = new HashSet<>();
     for (String countryName : path) {
       Country country = countries.get(countryName);
@@ -234,16 +208,12 @@ public class MapEngine {
     return new ArrayList<>(continents);
   }
 
-  /**
-   * Calculates the total taxes for the path.
-   *
-   * @param path
-   * @return
-   */
   private int calculateTaxes(List<String> path) {
     int totalTaxes = 0;
-    for (String countryName : path) {
-      Country country = countries.get(countryName);
+    for (int i = 1;
+        i < path.size();
+        i++) { // Start from the second country to exclude the tax of the starting country
+      Country country = countries.get(path.get(i));
       totalTaxes += country.getTax();
     }
     return totalTaxes;
